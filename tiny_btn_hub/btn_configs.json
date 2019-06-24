@@ -1,0 +1,66 @@
+{
+    "0": {
+        "click": {
+            "group": "bathroom",
+            "command": "toggle"
+        },
+        "dbl_click": {
+            "group": "bathroom",
+            "command": "increment_brightness_by_percent",
+            "args": [10, 400, false, true]
+        },
+        "hold": {
+            "group": "bathroom",
+            "command": "increment_brightness_by_percent",
+            "args": [-10],
+            "kwargs": {
+                "duration": 400,
+                "wrap": false
+            }
+        }
+    },
+    "1": {
+        "click": {
+            "group": "bedroom_lamps",
+            "command": "toggle"
+        },
+        "dbl_click": {
+            "group": "bedroom_fan",
+            "command": "toggle"
+        },
+        "hold": {
+            "group": "bedroom",
+            "command": "increment_brightness_by_percent",
+            "args": [10, 400, false, true],
+            "kwargs": {"wrap": false}
+        }
+    },
+    "2": {
+        "click": {
+            "group": "entry",
+            "command": "toggle"
+        },
+        "dbl_click": {
+            "group": "all",
+            "command": "toggle"
+        },
+        "hold": {
+            "group": "all",
+            "command": "off"
+        }
+    },
+    "3": {
+        "click": {
+            "group": "living_room",
+            "command": "toggle"
+        },
+        "dbl_click": {
+            "group": "living_room_fan",
+            "command": "toggle"
+        },
+        "hold": {
+            "group": "living_room_lamp",
+            "command": "toggle"
+        }
+    }
+}

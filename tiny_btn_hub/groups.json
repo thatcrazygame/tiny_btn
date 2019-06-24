@@ -1,0 +1,70 @@
+{
+    "bedroom": {
+        "names": [
+            "Desk Lamp",
+            "Bedside Lamp",
+            "Bedroom Light 1",
+            "Bedroom Light 2"
+        ]
+    },
+    "bedroom_lamps": {
+        "names": [
+            "Desk Lamp",
+            "Bedside Lamp"
+        ]
+    },
+    "bedroom_fan": {
+        "names": [
+            "Bedroom Light 1",
+            "Bedroom Light 2"
+        ]
+    },
+    "bathroom": {
+        "names": [
+            "Bathroom 1",
+            "Bathroom 2"
+        ]
+    },
+    "entry": {
+        "names": [
+            "Front Hall"
+        ]
+    },
+    "kitchen": {
+        "names": [
+            "Left Boob",
+            "Right Boob"
+        ]
+    },
+    "living_room": {
+        "names": [
+            "Living Room Lamp",
+            "Living Room Light"
+        ]
+    },
+    "living_room_fan": {
+        "names": [
+            "Living Room Light"
+        ]
+    },
+    "living_room_lamp": {
+        "names": [
+            "Living Room Lamp"
+        ]
+    },
+    "all": {
+        "names": [
+            "Desk Lamp",
+            "Bedside Lamp",
+            "Bedroom Light 1",
+            "Bedroom Light 2",
+            "Bathroom 1",
+            "Bathroom 2",
+            "Left Boob",
+            "Right Boob",
+            "Living Room Lamp",
+            "Living Room Light",
+            "Front Hall"
+        ]
+    }
+}
