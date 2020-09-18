@@ -36,7 +36,15 @@
 #include <avr/interrupt.h>
 
 #include <OneButton.h>
-#include <Manchester.h>
+
+#include <RH_ASK.h>
+
+#define RADIOHEAD_BAUD 2000 // Transmission Speed
+#define RADIOHEAD_TX_PIN 1  // Pin of the 433MHz transmitter
+#define RADIOHEAD_RX_PIN -1 // Pin of the 433MHz receiver (here not used)
+
+RH_ASK driver(RADIOHEAD_BAUD, RADIOHEAD_RX_PIN, RADIOHEAD_TX_PIN);
+
 #include <SpeckTiny.h>
 #include <EEPROM.h>
 
@@ -59,23 +67,18 @@
 
 OneButton button(A1, true);
 
-uint8_t data[DATALENGTH];
-uint8_t message[MESSAGELENGTH];
-uint8_t encrypted[MESSAGELENGTH];
+//uint8_t encrypted[MESSAGELENGTH];
 
 uint8_t count_mem_idx = 0;
 uint32_t counter = 0;
 
-bool sending = 0;
 
 SpeckTiny speckTiny;
 
 void setup() {
-  data[0] = DATALENGTH;
-    
   speckTiny.setKey(key, keySize);
-  man.setupTransmit(TX_PIN, MAN_600);
-
+  driver.init();
+  
   button.setClickTicks(400);
   button.attachClick(singleclick);     
   button.attachDoubleClick(doubleclick);
@@ -85,9 +88,9 @@ void setup() {
   if (count_mem_idx == 0) count_mem_idx = 1;
   EEPROM.get(count_mem_idx, counter);
   if (counter + 1 == 0) counter = 0; // first read after uploading code is at uint32 max for some reason
-  if (count_mem_idx != calc_mem_idx(counter)) {
+  //if (count_mem_idx != calc_mem_idx(counter)) {
     // TODO: ERROR mistmatch in index
-  }
+  //}
   
     
 //  pinMode(LED_PIN, OUTPUT);    // for testing
@@ -119,9 +122,12 @@ void longclick(){
 }
 
 void send_encrypted_action(uint8_t sender, uint8_t action) {
-  if ( ! sending ) {
-    sending = true;
+
+    uint8_t data[DATALENGTH];
+    data[0] = DATALENGTH;
     
+    uint8_t message[DATALENGTH];
+
     message[SENDER_IDX] = sender;
     message[ACTION_IDX] = action;
 
@@ -130,44 +136,28 @@ void send_encrypted_action(uint8_t sender, uint8_t action) {
     message[COUNTER_IDX + 1] = (uint8_t)(counter>>8);
     message[COUNTER_IDX    ] = (uint8_t)(counter>>0);
 
-    byte checksum = CRC8(message, CHECKSUM_IDX);
-    message[CHECKSUM_IDX] = checksum;
 
-    speckTiny.encryptBlock(encrypted, message);
+    speckTiny.encryptBlock(data, message);
   
-    for (uint8_t i=1; i < DATALENGTH; i++) {
-      data[i] = encrypted[i-1];  
-    }
+//    for (uint8_t i=1; i < DATALENGTH; i++) {
+//      data[i] = message[i-1];  
+//    }
     
-    man.transmitArray(DATALENGTH, data);
+    driver.send((uint8_t *)data, strlen(data));
+    driver.waitPacketSent();
   
     counter++;
-    count_mem_idx = calc_mem_idx(counter);
+    count_mem_idx = (counter / 99000) + 1;
     EEPROM.update(0, count_mem_idx);
     EEPROM.put(count_mem_idx, counter);
     
 //    moo = ++moo % 2; //for testing
 //    digitalWrite(LED_PIN, moo); // for testing
 
-    sending = false;
-  }
+
 } // send_encrypted_action
 
-byte CRC8(const byte *data, byte len) {
-  byte crc = 0x00;
-  while (len--) {
-    byte extract = *data++;
-    for (byte tempI = 8; tempI; tempI--) {
-      byte sum = (crc ^ extract) & 0x01;
-      crc >>= 1;
-      if (sum) {
-        crc ^= 0x8C;
-      }
-      extract >>= 1;
-    }
-  }
-  return crc;
-} // CRC8
+
 
 void sleep() {
     GIMSK |= _BV(PCIE);                     // Enable Pin Change Interrupts
@@ -187,15 +177,16 @@ void sleep() {
     sei();                                  // Enable interrupts
 } // sleep
 
-uint8_t calc_mem_idx(uint32_t counter) {
+
+//uint8_t calc_mem_idx(uint32_t counter) {
   /*
    * EEPROM limit of 100,000 write cycles
    * This will iterate the counter through the indexes 
    * so it doesn't write the same location too much.
    * Might be overdoing it, but better safe than sorry.
    */
-  return (counter / 99000) + 1;
-} //calc_mem_idx
+  //return (counter / 99000) + 1;
+//} //calc_mem_idx
 
 ISR(PCINT0_vect) {
   // don't need to do anything here
